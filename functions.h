@@ -3,7 +3,9 @@
 
 #include "processStrct.h"
 int sortAreadinp(struct Process processArr[]);
-void * exitPqueue(void * queue, int limit);
 void showqueue(struct Process* queue, int limit);
+void showProcessInf(struct Process p);
+void FIFOadd(struct Process object, struct Process* queue, int* limit);
+void* FIFOextract(struct Process* queue, int* limit);
 
 #endif

@@ -4,10 +4,11 @@
 
 void showqueue(struct Process* queue, int limit)
 {
-  printf("process array members are:\n");
+  printf("array members are:\n");
   int i;
   for (i = 0; i < limit; i ++)
     printf("%d- %s %d %d %d\n", i, queue[i].name,queue[i].startT, queue[i].burstT, queue[i].memNeed);
+  printf("end...\n");
 }
 
 void showProcessInf(struct Process p)
@@ -16,6 +17,14 @@ void showProcessInf(struct Process p)
   printf("start time: %d && burst time: %d && memory need: %d\n", p.startT, p.burstT, p.memNeed);
 }
 
+void showqueueByname(struct Process* queue, int limit)
+{
+  printf("members are: ");
+  int i;
+  for (i = 0; i < limit; i ++)
+    printf("%d-(%s) ", i, queue[i].name);
+  printf("...endd\n");
+}
 void swap(struct Process* a, struct Process* b)
 {
 	struct Process tmp = *a;

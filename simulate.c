@@ -38,16 +38,18 @@ int main(){
 		running = Ready[turn];
 		// process consumes cpu
 		if (running.burstT > quantum + 1){
-			printf("%s take %dms and continued...\n", running.name, quantum);
+			printf("%d: %s take %dms and continued...\n", globtimer, running.name, quantum);
 			running.burstT -= quantum;
 			globtimer += quantum;
 		} else{
-			printf("%s take %dms and terminated...\n", running.name, running.burstT);
+			printf("%d: %s take %dms and terminated...\n", globtimer, running.name, running.burstT);
 			// terminate process
 			globtimer += running.burstT;
 			FIFOadd((struct Process*) FIFOextract(turn, Ready, &Rlim), Terminate, &Tlim);
 			turn --;
 		}
+		printf("debug tool: ready queue: ");
+		showqueueByname(Ready, Rlim);
 		usleep(100000);
 		checkNewCommers(globtimer, New, &Nlim, Ready, &Rlim);
 		if (Nlim == 0 && Rlim == 0) break;

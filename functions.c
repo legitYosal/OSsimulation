@@ -4,10 +4,10 @@
 
 void showqueue(struct Process* queue, int limit)
 {
+  prinft("process array members are:\n")
   int i;
   for (i = 0; i < limit; i ++)
-    printf("\n%s %d %d %d", queue[i].name,queue[i].startT, queue[i].burstT, queue[i].memNeed);
-
+    printf("%d- %s %d %d %d\n", i, queue[i].name,queue[i].startT, queue[i].burstT, queue[i].memNeed);
 }
 
 void showProcessInf(struct Process p)
@@ -60,18 +60,18 @@ int sortAreadinp(struct Process processArr[])
 {
 	int limit;
 	scanf("%d", &limit);
-	int i = 0;
-	for (i; i < limit; i ++){
+	int i;
+	for (i = 0; i < limit; i ++){
 		 scanf("%s %d %d %d", processArr[i].name, &processArr[i].startT, &processArr[i].burstT, &processArr[i].memNeed);
 	}
 	sortProcessQueuebyStartT(processArr, limit);
 	return limit;
 }
 
-void* FIFOextract(struct Process* queue, int* limit)
+void* FIFOextract(int witchone, struct Process* queue, int* limit)
 {
-	int i;
-  for (i; i < *limit - 1; i ++)
+	int i = witchone;
+  for (i = 0; i < *limit - 1; i ++)
     swap(&queue[i], &queue[i + 1]);
   return (void*) &queue[--*limit];
 }

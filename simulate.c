@@ -33,7 +33,7 @@ int main(){
 	showqueue(Ready, Rlim);
 
 	printf("[***] scheduler started\n\n");
-	while(7999) // round rabin scheduler
+	if (Rlim > 0) while(7999) // round rabin scheduler
 	{
 		running = Ready[turn];
 		// process consumes cpu
@@ -56,7 +56,7 @@ int main(){
 	printf("\n[**] scheduling ended...\n");
 
 	showqueue(New, Nlim);
-	showqueue(Ready, Nlim);
+	showqueue(Ready, Rlim);
 	showqueue(Terminate, Tlim);
 	return 0;
 }

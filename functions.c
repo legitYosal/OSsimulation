@@ -78,5 +78,6 @@ void* FIFOextract(int witchone, struct Process* queue, int* limit)
 
 void FIFOadd(struct Process* p, struct Process* queue, int* limit)
 {
-  queue[*limit++] = *p;
+  printf("bellow process is adding to ready\n");
+  queue[*limit] = *p;
 }

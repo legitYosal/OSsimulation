@@ -2,7 +2,7 @@
 #include "functions.h"
 
 
-void checkNewCommers(int globtimer, struct Process New[], int *Nlim, struct Process Ready, int* Rlim)
+void checkNewCommers(int globtimer, struct Process* New, int *Nlim, struct Process* Ready, int* Rlim)
 {
 	int i = 0;
 	while (i < *Nlim)
@@ -49,7 +49,7 @@ int main(){
 		if (Rlim == 0) break;
 		turn = (turn + 1) % Rlim;
 	}
-	prinft("\n[**] scheduling ended...\n");
+	printf("\n[**] scheduling ended...\n");
 
 	showqueue(New, Nlim);
 	showqueue(Ready, Nlim);

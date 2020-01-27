@@ -4,7 +4,7 @@
 
 void showqueue(struct Process* queue, int limit)
 {
-  prinft("process array members are:\n")
+  prinft("process array members are:\n");
   int i;
   for (i = 0; i < limit; i ++)
     printf("%d- %s %d %d %d\n", i, queue[i].name,queue[i].startT, queue[i].burstT, queue[i].memNeed);
@@ -23,7 +23,7 @@ void swap(struct Process* a, struct Process* b)
 	*b = tmp;
 }
 
-int partition(struct Process processArr[], int start, int end)
+int partition(struct Process* processArr, int start, int end)
 {
 	int pivot = processArr[end].startT;
 	int i = (start - 1);
@@ -40,7 +40,7 @@ int partition(struct Process processArr[], int start, int end)
 	return (i + 1);
 }
 
-int quicksort(struct Process processArr[], int start, int end)
+int quicksort(struct Process* processArr, int start, int end)
 {
 	if (start < end)
 	{
@@ -50,13 +50,13 @@ int quicksort(struct Process processArr[], int start, int end)
 	}
 }
 
-int sortProcessQueuebyStartT(struct Process processArr[], int limit)
+int sortProcessQueuebyStartT(struct Process* processArr, int limit)
 {
 	quicksort(processArr, 0, limit - 1);
 	return 0;
 }
 
-int sortAreadinp(struct Process processArr[])
+int sortAreadinp(struct Process* processArr)
 {
 	int limit;
 	scanf("%d", &limit);

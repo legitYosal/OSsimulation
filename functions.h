@@ -6,6 +6,6 @@ int sortAreadinp(struct Process processArr[]);
 void showqueue(struct Process* queue, int limit);
 void showProcessInf(struct Process p);
 void FIFOadd(struct Process object, struct Process* queue, int* limit);
-void* FIFOextract(struct Process* queue, int* limit);
+void* FIFOextract(int witchone, struct Process* queue, int* limit);
 
 #endif

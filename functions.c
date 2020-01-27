@@ -19,11 +19,11 @@ void showProcessInf(struct Process p)
 
 void showqueueByname(struct Process* queue, int limit)
 {
-  printf("members are: ");
+  printf("members::[...");
   int i;
   for (i = 0; i < limit; i ++)
     printf("%d-(%s) ", i, queue[i].name);
-  printf("...endd\n");
+  printf("...]\n");
 }
 void swap(struct Process* a, struct Process* b)
 {

@@ -7,8 +7,8 @@ void checkNewCommers(int globtimer, struct Process* New, int *Nlim, struct Proce
 	int i = 0;
 	while (i < *Nlim)
 		if (New[i].startT < globtimer + 1){
-			prinft("prcess %s has arrived...\n", New[i].name);
-			FIFOadd(*(struct Process*)FIFOextract(0, New, Nlim), Ready, Rlim);
+			printf("prcess %s has arrived...\n", New[i].name);
+			FIFOadd((struct Process*)FIFOextract(0, New, Nlim), Ready, Rlim);
 		}
 		else
 			break;
@@ -43,7 +43,7 @@ int main(){
 			printf("%s take %dms and terminated...\n", running.name, running.burstT);
 			// terminate process
 			globtimer += running.burstT;
-			FIFOadd(*(struct Process*) FIFOextract(turn, Ready, &Rlim), Terminate, &Tlim);
+			FIFOadd((struct Process*) FIFOextract(turn, Ready, &Rlim), Terminate, &Tlim);
 			turn --;
 		}
 

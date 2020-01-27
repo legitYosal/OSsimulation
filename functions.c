@@ -76,7 +76,7 @@ void* FIFOextract(int witchone, struct Process* queue, int* limit)
   return (void*) &queue[--*limit];
 }
 
-void FIFOadd(struct Process object, struct Process* queue, int* limit)
+void FIFOadd(struct Process* p, struct Process* queue, int* limit)
 {
-  queue[*limit++] = object;
+  queue[*limit++] = *p;
 }

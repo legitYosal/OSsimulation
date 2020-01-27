@@ -38,13 +38,13 @@ int main(){
 		running = Ready[turn];
 		// process consumes cpu
 		if (running.burstT > quantum + 1){
+			globtimer += quantum;
 			printf("%d: %s take %dms and continued...\n", globtimer, running.name, quantum);
 			running.burstT -= quantum;
-			globtimer += quantum;
 		} else{
+			globtimer += running.burstT;
 			printf("%d: %s take %dms and terminated...\n", globtimer, running.name, running.burstT);
 			// terminate process
-			globtimer += running.burstT;
 			FIFOadd((struct Process*) FIFOextract(turn, Ready, &Rlim), Terminate, &Tlim);
 			turn --;
 		}

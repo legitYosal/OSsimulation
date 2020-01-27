@@ -79,6 +79,7 @@ int sortAreadinp(struct Process* processArr)
 
 void* FIFOextract(int witchone, struct Process* queue, int* limit)
 {
+  if (*limit == 0) return NULL;
 	int i = witchone;
   for (i; i < *limit - 1; i ++)
     swap(&queue[i], &queue[i + 1]);

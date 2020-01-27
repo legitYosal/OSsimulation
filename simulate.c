@@ -9,7 +9,7 @@ int main(){
 	int Rlim = 0;
 	int globtimer = New[0].startT;
 	showqueue(New, Nlim);
-	showProcessInf(*(struct Process*) FIFOextract(New, Nlim))
+	showProcessInf(*(struct Process*) FIFOextract(New, &Nlim));
 	showqueue(New, Nlim);
 	return 0;
 }

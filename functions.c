@@ -13,7 +13,7 @@ void showqueue(struct Process* queue, int limit)
 void showProcessInf(struct Process p)
 {
   printf("process: %s\n", p.name);
-  prinft("start time: %d && burst time: %d && memory need: %d\n", p.startT, p.burstT, p.memNeed);
+  printf("start time: %d && burst time: %d && memory need: %d\n", p.startT, p.burstT, p.memNeed);
 }
 
 void swap(struct Process* a, struct Process* b)
@@ -71,12 +71,12 @@ int sortAreadinp(struct Process processArr[])
 void* FIFOextract(struct Process* queue, int* limit)
 {
 	int i;
-  for (i; i < limit - 1; i ++)
-    swap(queue[i], queue[i + 1]);
-  return (void*) &queue[--limit];
+  for (i; i < *limit - 1; i ++)
+    swap(&queue[i], &queue[i + 1]);
+  return (void*) &queue[--*limit];
 }
 
 void FIFOadd(struct Process object, struct Process* queue, int* limit)
 {
-  queue[limit++] = object;
+  queue[*limit++] = object;
 }

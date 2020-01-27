@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
 #include "functions.h"
 
 
@@ -46,9 +48,9 @@ int main(){
 			FIFOadd((struct Process*) FIFOextract(turn, Ready, &Rlim), Terminate, &Tlim);
 			turn --;
 		}
-
+		usleep(100000);
 		checkNewCommers(globtimer, New, &Nlim, Ready, &Rlim);
-		if (Rlim == 0) break;
+		if (Nlim == 0 && Rlim == 0) break;
 		turn = (turn + 1) % Rlim;
 	}
 	printf("\n[**] scheduling ended...\n");

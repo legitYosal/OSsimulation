@@ -4,7 +4,7 @@
 
 void showqueue(struct Process* queue, int limit)
 {
-  prinft("process array members are:\n");
+  printf("process array members are:\n");
   int i;
   for (i = 0; i < limit; i ++)
     printf("%d- %s %d %d %d\n", i, queue[i].name,queue[i].startT, queue[i].burstT, queue[i].memNeed);

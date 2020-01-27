@@ -6,8 +6,10 @@ void checkNewCommers(int globtimer, struct Process* New, int *Nlim, struct Proce
 {
 	int i = 0;
 	while (i < *Nlim)
-		if (New[i].startT < globtimer + 1)
+		if (New[i].startT < globtimer + 1){
+			prinft("prcess %s has arrived...\n", New[i].name);
 			FIFOadd(*(struct Process*)FIFOextract(0, New, Nlim), Ready, Rlim);
+		}
 		else
 			break;
 }

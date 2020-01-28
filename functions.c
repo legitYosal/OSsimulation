@@ -7,30 +7,39 @@ void showqueue(struct Process* queue, int limit)
   printf("array members are:\n");
   int i;
   for (i = 0; i < limit; i ++)
-    printf("%d- %s %d %d %d\n", i, queue[i].name,queue[i].startT, queue[i].burstT, queue[i].memNeed);
+    printf("%d- %s %d %d %ld\n", i, queue[i].name,queue[i].startT, queue[i].burstT, queue[i].memNeed);
   printf("end...\n");
 }
 
 void showProcessInf(struct Process p)
 {
   printf("process: %s\n", p.name);
-  printf("start time: %d && burst time: %d && memory need: %d\n", p.startT, p.burstT, p.memNeed);
+  printf("start time: %d && burst time: %d && memory need: %ld\n", p.startT, p.burstT, p.memNeed);
 }
 
 void showqueueByname(struct Process* queue, int limit)
 {
-  printf("members::[...");
+  printf("members==[   ");
   int i;
   for (i = 0; i < limit; i ++)
-    printf("%d-(%s) ", i, queue[i].name);
-  printf("...]\n");
+    printf("(%s) ", i, queue[i].name);
+  printf("   ]\n");
 }
-void swap(struct Process* a, struct Process* b)
+
+void swap(char* a, char* b)
 {
-	struct Process tmp = *a;
-	*a = *b;
-	*b = tmp;
+    int size = sizeof(*a);
+    char* tmp = (char *) malloc(size);
+    int i;
+    for (i = 0; i < size; i ++)
+        tmp[i] = a[i];
+    for (i = 0; i < size; i ++)
+        a[i] = b[i];
+    for (i = 0; i < size; i ++)
+        b[i] = tmp[i];
+    free(tmp);
 }
+
 
 int partition(struct Process* processArr, int start, int end)
 {
@@ -42,10 +51,10 @@ int partition(struct Process* processArr, int start, int end)
 		if (processArr[j].startT < pivot)
 		{
 			i++;
-			swap(&processArr[i], &processArr[j]);
+			swap((char *)&processArr[i], (char *)&processArr[j]);
 		}
 	}
-	swap(&processArr[i + 1], &processArr[end]);
+	swap((char *)&processArr[i + 1], (char *)&processArr[end]);
 	return (i + 1);
 }
 
@@ -70,9 +79,8 @@ int sortAreadinp(struct Process* processArr)
 	int limit;
 	scanf("%d", &limit);
 	int i;
-	for (i = 0; i < limit; i ++){
-		 scanf("%s %d %d %d", processArr[i].name, &processArr[i].startT, &processArr[i].burstT, &processArr[i].memNeed);
-	}
+	for (i = 0; i < limit; i ++)
+		 scanf("%s %d %d %ld", processArr[i].name, &processArr[i].startT, &processArr[i].burstT, &processArr[i].memNeed);
 	sortProcessQueuebyStartT(processArr, limit);
 	return limit;
 }
@@ -82,7 +90,7 @@ void* FIFOextract(int witchone, struct Process* queue, int* limit)
   if (*limit == 0) return NULL;
 	int i = witchone;
   for (i; i < *limit - 1; i ++)
-    swap(&queue[i], &queue[i + 1]);
+    swap((char *)&queue[i], (char *)&queue[i + 1]);
   return (void*) &queue[--(*limit)];
 }
 

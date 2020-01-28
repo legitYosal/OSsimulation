@@ -1,5 +1,26 @@
-h1 20 443 23
-h2 120 645 434
-h3 5002 654 5664
+h1 20 443 8000000000
+h2 120 645 4000000000
+h3 5002 654 3000000000
 h4 323 434 34343
 h5 20 433 34342
+
+
+
+partition memory table
+partition size | memory address | access process | status
+
+
+every process comming from new to ready most be checked for memory allocation
+and if it is possible must allocate to proeces its mem Need
+possible to allocate?
+      ok  then allocate
+      not then block process and continue
+
+how to allocate?
+  naming orginal partition
+  must make two new partition with prcess size from orgi start to process size - 1
+  and from process size to orgi size + orgi start - 1
+  then push this two into orgi location in Memory allocation partitions array
+
+every process terminating must deallocate its memory and memory manager must check
+for free partition blocks beside each other and unite them

@@ -9,9 +9,11 @@ long int allocateMemory(struct Process* p, struct Partition* Memory, int* Mlim)
 {
 	int bestfit = -1;
 	long int bestsize = MAXMEMSIZE;
+	struct partition busy;
+	struct partition loose;
 	int i;
 	for (i = 0; i < *Mlim; i ++){ // for all free partitions in partition memory table
-		if (Memory[i].state == 'F' && p->memNeed <= Memory[i].size)
+		if (Memory[i].status == 'F' && p->memNeed <= Memory[i].size)
 			if (Memory[i].size <= bestsize){ // here is allocation best fit policy
 				bestfit = i;
 				bestsize = Memory[i].size;
@@ -19,24 +21,22 @@ long int allocateMemory(struct Process* p, struct Partition* Memory, int* Mlim)
 	}
 	if (bestfit == -1) return -1;
 	// other wise founded a best fit then must allocate processs to the best fit partition
-	struct partition busy;
 	busy.size = p->memNeed;
 	busy.address = Memory[bestfit].address;
 	busy.access = p;
-	p.allocation = busy;
-	status = 'B';
+	p->allocation = busy;
+	busy.status = 'B';
 	if (Memory[bestfit].size - p->memNeed == 0){
 		Memory[bestfit] = busy;
 		return bestfit;
 	}
 	// other size there will be a over head partition
-	struct partition loose;
 	loose.size = Memory[bestfit].size - p->memNeed;
 	loose.address = Memory[bestfit].address + p->memNeed;
 	status = 'F';
 	Memory[bestfit] = busy;
 	Memory[(*Mlim)++] = loose;
-	for (i = Mlim - 1; i > bestfit + 1; i --)
+	for (i = *Mlim - 1; i > bestfit + 1; i --)
 		swap((char *) &Memory[i], (char *) &Memory[i - 1]);
 	return bestfit;
 }
@@ -52,7 +52,7 @@ void uniteBelowPartitions(int index, struct Partition* Memory, int* Mlim)
 			 	if (Memory[i].status == 'B')
 			 			Memory[i].access->allocation = &Memory[i];
 	 	}
- 		(*Mlim)--
+ 		(*Mlim)--;
 		uniteBelowPartitions(index, Memory, Mlim);
 	}
 }
@@ -65,7 +65,7 @@ void deallocateMemory(struct Process* p, struct Partition* Memory, int* Mlim)
 	part->status = 'F';
 	// now that the partition is free memory manager must unite every partition that are neighbours
 	int index = ((void*) part - (void*) Memory) / sizeof(struct Partition);
-	while(index > 0 && Memory[index - 1] == 'F') index --;
+	while(index > 0 && Memory[index - 1].status == 'F') index --;
 	uniteBelowPartitions(index, Memory, Mlim);
 }
 
@@ -84,7 +84,7 @@ checkBlockedes(struct Process* Block, int* Blim, struct Process* Ready, int* Rli
 	}
 }
 void checkNewCommers(int globtimer, struct Process* New, int *Nlim, struct Process* Ready, int* Rlim,
-	 									struct Partition* Memory, int* Mlim, struct Process* Block, int* Blim);
+	 									struct Partition* Memory, int* Mlim, struct Process* Block, int* Blim)
 {
 	int i = 0;
 	long int result;

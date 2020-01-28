@@ -20,35 +20,35 @@ long int allocateMemory(struct Process* p, struct Partition* Memory, int* Mlim)
 	if (bestfit == -1) return -1;
 	// other wise founded a best fit then must allocate processs to the best fit partition
 	struct partition busy;
-	busy.size = p->size;
+	busy.size = p->memNeed;
 	busy.address = Memory[bestfit].address;
 	busy.access = p;
 	p.allocation = busy;
 	status = 'B';
-	if (Memory[bestfit].size - p->size == 0){
+	if (Memory[bestfit].size - p->memNeed == 0){
 		Memory[bestfit] = busy;
 		return bestfit;
 	}
 	// other size there will be a over head partition
-	struct partition free;
-	free.size = Memory[bestfit].size - p->size;
-	free.address = Memory[bestfit].address + p->size;
+	struct partition loose;
+	loose.size = Memory[bestfit].size - p->memNeed;
+	loose.address = Memory[bestfit].address + p->memNeed;
 	status = 'F';
 	Memory[bestfit] = busy;
-	Memory[(*Mlim)++] = free;
+	Memory[(*Mlim)++] = loose;
 	for (i = Mlim - 1; i > bestfit + 1; i --)
-		swap((char *)Memory[i], (char *)Memory[i - 1]);
+		swap((char *) &Memory[i], (char *) &Memory[i - 1]);
 	return bestfit;
 }
 
-void uniteBellowPartitions(int index, struct Partition* Memory, int* Mlim)
+void uniteBelowPartitions(int index, struct Partition* Memory, int* Mlim)
 {
 
 	if (Memory[index + 1].status == 'F'){
 		int i;
 		Memory[index].size += Memory[index + 1].size;
 		for (i = index + 1; i < *Mlim - 1; i ++){
-			 	swap((char*) Memory[i], (char*) Memory[i + 1]);
+			 	swap((char*) &Memory[i], (char*) &Memory[i + 1]);
 			 	if (Memory[i].status == 'B')
 			 			Memory[i].access->allocation = &Memory[i];
 	 	}
@@ -69,11 +69,12 @@ void deallocateMemory(struct Process* p, struct Partition* Memory, int* Mlim)
 	uniteBelowPartitions(index, Memory, Mlim);
 }
 
-checkBlockedes(struct Process* Block, int* Blim, struct Process* Ready, int* Rlim)
+checkBlockedes(struct Process* Block, int* Blim, struct Process* Ready, int* Rlim,
+							 struct Partition* Memory, int* Mlim)
 {
 	// to do : before check just sort block to order by memory need
 	int i;
-	long int = result;
+	long int result;
 	for (i = 0; i < *Blim; i ++){
 		result = allocateMemory(&Block[i], Memory, Mlim);
 		if (result != -1){
@@ -158,7 +159,7 @@ int main()
 			deallocateMemory(running, Memory, &Mlim); ///
 			FIFOadd(running, Terminate, &Tlim);
 			/// after dealocating memory there is a chance for blocked processes
-			checkBlockedes(Block, &Blim, Ready, &Rlim);
+			checkBlockedes(Block, &Blim, Ready, &Rlim, Memory, &Mlim);
 		}
 		usleep(1000);
 		checkNewCommers(globtimer, New, &Nlim, Ready, &Rlim,

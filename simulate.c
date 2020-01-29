@@ -86,7 +86,7 @@ void checkBlockedes(struct Process* Block, int* Blim, struct Process* Ready, int
 			FIFOextract(&survive, i, Block, Blim);
 			i--;
 			allocateMemory(result, &survive, Memory, Mlim);
-			printf(" ** blocked process %s has been allocated to %ld", survive.name, result);
+			printf(" ** blocked process %s has been allocated to %lld", survive.name, result);
 			FIFOadd(&survive, Ready, Rlim);
 		}
 	}
@@ -109,7 +109,7 @@ void checkNewCommers(int globtimer, struct Process* New, int *Nlim, struct Proce
 				FIFOextract(&newblocked, 0, New, Nlim);
 				FIFOadd(&newblocked, Block, Blim);
 			} else{
-				printf("				... and allocated to %ld\n", Memory[result].address);
+				printf("				... and allocated to %lld\n", Memory[result].address);
 				struct Process newready;
 				FIFOextract(&newready, 0, New, Nlim);
 				allocateMemory(result, &newready, Memory, Mlim);
@@ -128,7 +128,7 @@ int initMemory(struct Partition* memory)
 	memory[0].size = MAXMEMSIZE; // maximom size of memory
 	memory[0].access = NULL;
 	memory[0].status = 'F';
-	printf("memory initated with one partition of size: %ld\n", memory[0].size);
+	printf("memory initated with one partition of size: %lld\n", memory[0].size);
 	return limit;
 }
 

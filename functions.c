@@ -7,14 +7,14 @@ void showqueue(struct Process* queue, int limit)
   printf("array members are:\n");
   int i;
   for (i = 0; i < limit; i ++)
-    printf("%d- %s %d %d %ld\n", i, queue[i].name,queue[i].startT, queue[i].burstT, queue[i].memNeed);
+    printf("%d- %s %d %d %lld\n", i, queue[i].name,queue[i].startT, queue[i].burstT, queue[i].memNeed);
   printf("end...\n");
 }
 
 void showProcessInf(struct Process p)
 {
   printf("process: %s\n", p.name);
-  printf("start time: %d && burst time: %d && memory need: %ld\n", p.startT, p.burstT, p.memNeed);
+  printf("start time: %d && burst time: %d && memory need: %lld\n", p.startT, p.burstT, p.memNeed);
 }
 
 void showqueueByname(struct Process* queue, int limit)
@@ -25,7 +25,6 @@ void showqueueByname(struct Process* queue, int limit)
     printf("(%s) ", queue[i].name);
   printf("  ]\n");
 }
-
 void swap(char* a, char* b)
 {
     int size = sizeof(*a);
@@ -78,7 +77,7 @@ int sortAreadinp(struct Process* processArr)
 	scanf("%d", &limit);
 	int i;
 	for (i = 0; i < limit; i ++)
-		 scanf("%s %d %d %ld", processArr[i].name, &processArr[i].startT, &processArr[i].burstT, &processArr[i].memNeed);
+		 scanf("%s %d %d %lld", processArr[i].name, &processArr[i].startT, &processArr[i].burstT, &processArr[i].memNeed);
 	sortProcessQueuebyStartT(processArr, limit);
 	return limit;
 }

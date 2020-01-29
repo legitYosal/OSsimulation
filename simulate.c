@@ -4,7 +4,7 @@
 #include "functions.h"
 
 const int MAXPROCESS = 100;
-const long int MAXMEMSIZE = 8589934591;	 /* 8GB */
+const long int MAXMEMSIZE = (long int) 8589934592;	 /* 8GB */
 
 long int allocateMemory(struct Process* p, struct Partition* Memory, int* Mlim)
 {
@@ -25,7 +25,7 @@ long int allocateMemory(struct Process* p, struct Partition* Memory, int* Mlim)
 	busy.size = p->memNeed;
 	busy.address = Memory[bestfit].address;
 	busy.access = p;
-	p->allocation = busy;
+	p->allocation = &busy;
 	busy.status = 'B';
 	if (Memory[bestfit].size - p->memNeed == 0){
 		Memory[bestfit] = busy;

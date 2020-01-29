@@ -34,18 +34,18 @@ void showqueueByname(struct Process* queue, int limit)
     printf("(%s) ", queue[i].name);
   printf("  ]\n");
 }
-void swap(char* a, char* b)
+
+void swap(struct Process* a, struct Process* b)
 {
-    int size = sizeof(*a);
-    char* tmp = (char *) malloc(size);
-    int i;
-    for (i = 0; i < size; i ++)
-        tmp[i] = a[i];
-    for (i = 0; i < size; i ++)
-        a[i] = b[i];
-    for (i = 0; i < size; i ++)
-        b[i] = tmp[i];
-    free(tmp);
+	struct Process tmp = *a;
+	*a = *b;
+	*b = tmp;
+}
+void swapPartition(struct Partition* a, struct Partition* b)
+{
+  struct Partition tmp = *a;
+  *a = *b;
+  *b = tmp;
 }
 
 int partition(struct Process* processArr, int start, int end)
@@ -58,10 +58,10 @@ int partition(struct Process* processArr, int start, int end)
 		if (processArr[j].startT < pivot)
 		{
 			i++;
-			swap((char *)&processArr[i], (char *)&processArr[j]);
+			swap(&processArr[i], &processArr[j]);
 		}
 	}
-	swap((char *)&processArr[i + 1], (char *)&processArr[end]);
+	swap(&processArr[i + 1], &processArr[end]);
 	return (i + 1);
 }
 
@@ -96,7 +96,7 @@ int FIFOextract(struct Process* excratedP, int witchone, struct Process* queue, 
   if (*limit == 0) return 0;
 	int i = witchone;
   for (i; i < *limit - 1; i ++)
-    swap((char *)&queue[i], (char *)&queue[i + 1]);
+    swap(&queue[i], &queue[i + 1]);
   *excratedP = queue[(*limit)];
   (*limit) --;
   return 1;

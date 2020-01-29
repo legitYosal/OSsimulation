@@ -26,7 +26,7 @@ void allocateMemory(int bestfit, struct Process* p, struct Partition* Memory, in
 		Memory[bestfit] = busy;
 		Memory[(*Mlim)++] = loose;
 		for (i = *Mlim - 1; i > bestfit + 1; i --)
-			swap((char *) &Memory[i], (char *) &Memory[i - 1]);
+			swapPartition(&Memory[i], &Memory[i - 1]);
 	}
 }
 int memoryAvailable(struct Process* p, struct Partition* Memory, int Mlim)
@@ -51,7 +51,7 @@ void uniteBelowPartitions(int index, struct Partition* Memory, int* Mlim)
 		int i;
 		Memory[index].size += Memory[index + 1].size;
 		for (i = index + 1; i < *Mlim - 1; i ++){
-			 	swap((char*) &Memory[i], (char*) &Memory[i + 1]);
+			 	swapPartition(&Memory[i], &Memory[i + 1]);
 	 	}
  		(*Mlim)--;
 		uniteBelowPartitions(index, Memory, Mlim);
@@ -113,7 +113,7 @@ void checkNewCommers(int globtimer, struct Process* New, int *Nlim, struct Proce
 				FIFOextract(&tmp, 0, New, Nlim);
 				printf("process %s has extracted form queue new\n", tmp.name);
 				allocateMemory(result, &tmp, Memory, Mlim);
-				printf("and now it has property allocation with size: %lld\n", (tmp.allocation).size);
+				printf("and now it has property allocation with size: %lld\n", (tmp.allocation)->size);
 				showmemory(Memory, *Mlim);
 				FIFOadd(&tmp, Ready, Rlim);
 				printf("process added to ready now have name:%s", Ready[*Rlim - 1]);

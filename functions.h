@@ -1,6 +1,7 @@
 #ifndef FUNCTIONS_HEADER
 #define FUNCTIONS_HEADER
 
+#include "processStrct.h"
 void showqueue(struct Process* queue, int limit);
 void showProcessInf(struct Process p);
 void showqueueByname(struct Process* queue, int limit);

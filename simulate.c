@@ -2,7 +2,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include "functions.h"
-#include "processStrct.h"
 
 const int MAXPROCESS = 100;
 const long int MAXMEMSIZE = (long int) 8589934592;	 /* 8GB */

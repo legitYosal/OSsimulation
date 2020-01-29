@@ -14,5 +14,5 @@ struct Partition
   long int address;
   struct Process* access;
   char status; // B stands for busy && F stands for free
-}
+};
 #endif

@@ -2,15 +2,16 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include "functions.h"
-#define MAXPROCESS 100
-#define MAXMEMSIZE 8589934592 /* 8GB */
+
+const int MAXPROCESS = 100;
+const long int MAXMEMSIZE = 8589934592;	 /* 8GB */
 
 long int allocateMemory(struct Process* p, struct Partition* Memory, int* Mlim)
 {
 	int bestfit = -1;
 	long int bestsize = MAXMEMSIZE;
-	struct partition busy;
-	struct partition loose;
+	struct Partition busy;
+	struct Partition loose;
 	int i;
 	for (i = 0; i < *Mlim; i ++){ // for all free partitions in partition memory table
 		if (Memory[i].status == 'F' && p->memNeed <= Memory[i].size)
@@ -33,7 +34,7 @@ long int allocateMemory(struct Process* p, struct Partition* Memory, int* Mlim)
 	// other size there will be a over head partition
 	loose.size = Memory[bestfit].size - p->memNeed;
 	loose.address = Memory[bestfit].address + p->memNeed;
-	status = 'F';
+	loose.status = 'F';
 	Memory[bestfit] = busy;
 	Memory[(*Mlim)++] = loose;
 	for (i = *Mlim - 1; i > bestfit + 1; i --)
@@ -50,7 +51,7 @@ void uniteBelowPartitions(int index, struct Partition* Memory, int* Mlim)
 		for (i = index + 1; i < *Mlim - 1; i ++){
 			 	swap((char*) &Memory[i], (char*) &Memory[i + 1]);
 			 	if (Memory[i].status == 'B')
-			 			Memory[i].access->allocation = &Memory[i];
+			 			(Memory[i].access)->allocation = &Memory[i];
 	 	}
  		(*Mlim)--;
 		uniteBelowPartitions(index, Memory, Mlim);
@@ -69,7 +70,7 @@ void deallocateMemory(struct Process* p, struct Partition* Memory, int* Mlim)
 	uniteBelowPartitions(index, Memory, Mlim);
 }
 
-checkBlockedes(struct Process* Block, int* Blim, struct Process* Ready, int* Rlim,
+void checkBlockedes(struct Process* Block, int* Blim, struct Process* Ready, int* Rlim,
 							 struct Partition* Memory, int* Mlim)
 {
 	// to do : before check just sort block to order by memory need
@@ -82,6 +83,7 @@ checkBlockedes(struct Process* Block, int* Blim, struct Process* Ready, int* Rli
 			FIFOadd((struct Process*)FIFOextract(i, Block, Blim), Ready, Rlim);
 		}
 	}
+
 }
 void checkNewCommers(int globtimer, struct Process* New, int *Nlim, struct Process* Ready, int* Rlim,
 	 									struct Partition* Memory, int* Mlim, struct Process* Block, int* Blim)
@@ -125,7 +127,7 @@ int main()
 	int Rlim = 0;
 	struct Process Terminate[MAXPROCESS];
 	int Tlim = 0;
-	struct partition Memory[MAXPROCESS];
+	struct Partition Memory[MAXPROCESS];
 	int Mlim = initMemory(Memory);
 	struct Process Block[MAXPROCESS];
 	int Blim = 0;

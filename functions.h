@@ -2,6 +2,7 @@
 #define FUNCTIONS_HEADER
 
 #include "processStrct.h"
+
 int sortAreadinp(struct Process processArr[]);
 void showqueue(struct Process* queue, int limit);
 void showProcessInf(struct Process p);

@@ -53,7 +53,8 @@ void uniteBelowPartitions(int index, struct Partition* Memory, int* Mlim)
 			 	swapPartition(&Memory[i], &Memory[i + 1]);
 	 	}
  		(*Mlim)--;
-		uniteBelowPartitions(index, Memory, Mlim);
+		if (index + 1 < *Mlim)
+			uniteBelowPartitions(index, Memory, Mlim);
 	}
 }
 
@@ -70,20 +71,22 @@ void deallocateMemory(struct Process* p, struct Partition* Memory, int* Mlim)
 	uniteBelowPartitions(index, Memory, Mlim);
 }
 
-void checkBlockedes(struct Process* Block, int* Blim, struct Process* Ready, int* Rlim,
+void checkBlockedes(int globtimer, struct Process* Block, int* Blim, struct Process* Ready, int* Rlim,
 							 struct Partition* Memory, int* Mlim)
 {
 	// to do : before check just sort block to order by memory need
 	int i;
 	long long int result;
+	int cont;
+	struct Process survive;
 	for (i = 0; i < *Blim; i ++){
 		result = memoryAvailable(&Block[i], Memory, *Mlim);
 		if (result != -1){
-			struct Process survive;
-			FIFOextract(&survive, i, Block, Blim);
+			cont = FIFOextract(&survive, i, Block, Blim);
 			i--;
 			allocateMemory(result, &survive, Memory, Mlim);
-			printf(" ** blocked process %s has been allocated to %lld", survive.name, result);
+			printf(" ** blocked process %s has been re allocated to %lld", survive.name, result);
+			printf("%s %d %llx %llx\n", survive.name, globtimer, survive.allocation, (survive.allocation + survive.memNeed - 1));
 			FIFOadd(&survive, Ready, Rlim);
 		}
 	}
@@ -108,12 +111,9 @@ void checkNewCommers(int globtimer, struct Process* New, int *Nlim, struct Proce
 			} else{
 				printf("				... and allocated to %lld\n", Memory[result].address);
 				FIFOextract(&tmp, 0, New, Nlim);
-				printf("process %s has extracted form queue new\n", tmp.name);
 				allocateMemory(result, &tmp, Memory, Mlim);
-				printf("and now it has property allocation with size: %lld\n", (tmp.allocation));
-				showmemory(Memory, *Mlim);
+				printf("%s %d %llx %llx\n", tmp.name, globtimer, tmp.allocation, (tmp.allocation + tmp.memNeed - 1));
 				FIFOadd(&tmp, Ready, Rlim);
-				printf("process added to ready now have name:%s", Ready[*Rlim - 1].name);
 			}
 		}
 		else
@@ -152,12 +152,15 @@ int main()
 
 	printf("NEW ");showqueue(New, Nlim);
 	printf("READY ");showqueue(Ready, Rlim);
+	showmemory(Memory, Mlim);
+
 	int cont;
 	printf("[***] scheduler started\n\n");
 	if (Rlim > 0) while(7999) // round rabin scheduler
 	{
 		printf("ready queue: ");showqueueByname(Ready, Rlim);
 		printf("block queue: ");showqueueByname(Block, Blim);
+		showmemory(Memory, Mlim);
 		cont = FIFOextract(&running, 0, Ready, &Rlim);
 		// process consumes cpu
 		if (cont == 0)
@@ -174,15 +177,16 @@ int main()
 			deallocateMemory(&running, Memory, &Mlim); ///
 			FIFOadd(&running, Terminate, &Tlim);
 			/// after dealocating memory there is a chance for blocked processes
-			checkBlockedes(Block, &Blim, Ready, &Rlim, Memory, &Mlim);
+			if (Blim > 0)
+				checkBlockedes(globtimer, Block, &Blim, Ready, &Rlim, Memory, &Mlim);
 		}
-		usleep(1000);
 		checkNewCommers(globtimer, New, &Nlim, Ready, &Rlim,
 										Memory, &Mlim, Block, &Blim);
 		if (Nlim == 0 && Rlim == 0) break; // means no process will ever come
 	}
 	printf("\n[**] scheduling ended...\n");
 
+	showmemory(Memory, Mlim);
 	printf("NEW ");showqueue(New, Nlim);
 	printf("READY ");showqueue(Ready, Rlim);
 	printf("TERMINATE ");showqueue(Terminate, Tlim);

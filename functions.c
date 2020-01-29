@@ -22,7 +22,7 @@ void showqueueByname(struct Process* queue, int limit)
   printf("members==[   ");
   int i;
   for (i = 0; i < limit; i ++)
-    printf("(%s) ", i, queue[i].name);
+    printf("(%s) ", queue[i].name);
   printf("  ]\n");
 }
 

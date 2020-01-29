@@ -4,9 +4,9 @@
 #include "functions.h"
 
 const int MAXPROCESS = 100;
-const long int MAXMEMSIZE = (long int) 8589934592;	 /* 8GB */
+const long long int MAXMEMSIZE =  8589934592;	 /* 8GB */
 
-void allocateMemory(long int bestfit, struct Process* p, struct Partition* Memory, int* Mlim)
+void allocateMemory(long long int bestfit, struct Process* p, struct Partition* Memory, int* Mlim)
 {
 	struct Partition busy;
 	struct Partition loose;
@@ -29,10 +29,10 @@ void allocateMemory(long int bestfit, struct Process* p, struct Partition* Memor
 			swap((char *) &Memory[i], (char *) &Memory[i - 1]);
 	}
 }
-long int memoryAvailable(struct Process* p, struct Partition* Memory, int Mlim)
+long long int memoryAvailable(struct Process* p, struct Partition* Memory, int Mlim)
 {
 	int bestfit = -1;
-	long int bestsize = MAXMEMSIZE;
+	long long int bestsize = MAXMEMSIZE;
 	int i;
 	for (i = 0; i < Mlim; i ++){ // for all free partitions in partition memory table
 		if (Memory[i].status == 'F' && p->memNeed <= Memory[i].size)
@@ -78,7 +78,7 @@ void checkBlockedes(struct Process* Block, int* Blim, struct Process* Ready, int
 {
 	// to do : before check just sort block to order by memory need
 	int i;
-	long int result;
+	long long int result;
 	for (i = 0; i < *Blim; i ++){
 		result = memoryAvailable(&Block[i], Memory, *Mlim);
 		if (result != -1){
@@ -92,11 +92,12 @@ void checkBlockedes(struct Process* Block, int* Blim, struct Process* Ready, int
 	}
 
 }
+
 void checkNewCommers(int globtimer, struct Process* New, int *Nlim, struct Process* Ready, int* Rlim,
 	 									struct Partition* Memory, int* Mlim, struct Process* Block, int* Blim)
 {
 	int i = 0;
-	long int result;
+	long long int result;
 	while (i < *Nlim){
 		result = -1;
 		if (New[i].startT <= globtimer){
@@ -127,7 +128,7 @@ int initMemory(struct Partition* memory)
 	memory[0].size = MAXMEMSIZE; // maximom size of memory
 	memory[0].access = NULL;
 	memory[0].status = 'F';
-	printf("memory initated with one partition of size: %ld", memory[0].size);
+	printf("memory initated with one partition of size: %ld\n", memory[0].size);
 	return limit;
 }
 

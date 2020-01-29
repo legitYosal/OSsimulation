@@ -5,13 +5,13 @@ struct Process
 	char name[32];
 	int startT;
 	int burstT;
-	long int memNeed; // lesser than 8G available ram
+	long long int memNeed; // lesser than 8G available ram
   struct Partition* allocation;
 };
 struct Partition
 {
-  long int size;
-  long int address;
+  long long int size;
+  long long int address;
   struct Process* access; // this is note implicity ** bug hazard
   char status; // B stands for busy && F stands for free
 };

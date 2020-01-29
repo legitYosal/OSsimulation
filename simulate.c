@@ -10,7 +10,7 @@ void allocateMemory(long int bestfit, struct Process* p, struct Partition* Memor
 {
 	struct Partition busy;
 	struct Partition loose;
-
+	int i;
 	busy.size = p->memNeed;
 	busy.address = Memory[bestfit].address;
 	busy.access = p;
@@ -99,12 +99,15 @@ void checkNewCommers(int globtimer, struct Process* New, int *Nlim, struct Proce
 			resutl = memoryAvailable(&New[i], Memory, Mlim);
 			if (result == -1){
 				printf("				... and it has blocked\n");
-				FIFOadd((struct Process*)FIFOextract(0, New, Nlim), Block, Blim);
+				struct Process newblocked;
+				FIFOextract(&newblocked, 0, New, Nlim);
+				FIFOadd(newblocked, Block, Blim);
 			} else{
 				printf("				... and allocated to %ld\n", Memory[result].address);
-				struct Process* p = (struct Process*)FIFOextract(0, New, Nlim);
-				allocateMemory(result, &p, Memory, Mlim);
-				FIFOadd(p, Ready, Rlim);
+				struct Process newready;
+				FIFOextract(&newready, 0, New, Nlim);
+				allocateMemory(result, &newready, Memory, Mlim);
+				FIFOadd(newready, Ready, Rlim);
 			}
 		}
 		else
@@ -140,7 +143,7 @@ int main()
 	int globtimer = New[0].startT;
 	checkNewCommers(globtimer, New, &Nlim, Ready, &Rlim,
 									Memory, &Mlim, Block, &Blim);
-	struct Process* running;
+	struct Process running;
 
 	printf("NEW ");showqueue(New, Nlim);
 	printf("READY ");showqueue(Ready, Rlim);
@@ -150,21 +153,21 @@ int main()
 	{
 		printf("ready queue: ");showqueueByname(Ready, Rlim);
 		printf("block queue: ");showqueueByname(Block, Blim);
-		running = (struct Process *) FIFOextract(0, Ready, &Rlim);
+		FIFOextract(&running, 0, Ready, &Rlim);
 		// process consumes cpu
 		if (running == NULL)
 			globtimer = New[0].startT;
-		else if (running->burstT > quantum + 1){
+		else if (running.burstT > quantum + 1){
 			globtimer += quantum;
-			running->burstT -= quantum;
-			FIFOadd(running, Ready, &Rlim);
-			printf("%dms: %s take %dms and remained: %d ...\n", globtimer, running->name, quantum, running->burstT);
+			running.burstT -= quantum;
+			FIFOadd(&running, Ready, &Rlim);
+			printf("%dms: %s take %dms and remained: %d ...\n", globtimer, running.name, quantum, running.burstT);
 		} else{
-			globtimer += running->burstT;
+			globtimer += running.burstT;
 			// terminate process
-			printf("%dms: %s take %dms and terminated...\n", globtimer, running->name, running->burstT);
-			deallocateMemory(running, Memory, &Mlim); ///
-			FIFOadd(running, Terminate, &Tlim);
+			printf("%dms: %s take %dms and terminated...\n", globtimer, running.name, running.burstT);
+			deallocateMemory(&running, Memory, &Mlim); ///
+			FIFOadd(&running, Terminate, &Tlim);
 			/// after dealocating memory there is a chance for blocked processes
 			checkBlockedes(Block, &Blim, Ready, &Rlim, Memory, &Mlim);
 		}

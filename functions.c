@@ -83,16 +83,14 @@ int sortAreadinp(struct Process* processArr)
 	return limit;
 }
 
-void* FIFOextract(int witchone, struct Process* queue, int* limit)
+void FIFOextract(struct Process* excratedP, int witchone, struct Process* queue, int* limit)
 {
   if (*limit == 0) return NULL;
-  struct Process p;
 	int i = witchone;
   for (i; i < *limit - 1; i ++)
     swap((char *)&queue[i], (char *)&queue[i + 1]);
-  p = queue[(*limit)];
+  *excratedP = queue[(*limit)];
   (*limit) --;
-  return (void*) &p;
 }
 
 void FIFOadd(struct Process* p, struct Process* queue, int* limit)

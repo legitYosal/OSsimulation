@@ -97,7 +97,7 @@ int FIFOextract(struct Process* excratedP, int witchone, struct Process* queue, 
 	int i = witchone;
   for (i; i < *limit - 1; i ++)
     swap(&queue[i], &queue[i + 1]);
-  *excratedP = queue[(*limit)];
+  *excratedP = queue[(*limit) - 1];
   (*limit) --;
   return 1;
 }

@@ -16,7 +16,7 @@ void showmemory(struct Partition* memory, int limit)
   printf("memory blocks: [  \n");
   int i;
   for(i = 0; i < limit; i ++)
-    printf("part%d: add: %lld  size: %lld\n", i, memory[i].address, memory[i].size);
+    printf("part%d: add: %lld  size: %lld status: %c\n", i, memory[i].address, memory[i].size, memory[i].status);
   printf("  ] end** \n");
 }
 

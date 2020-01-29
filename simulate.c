@@ -161,7 +161,6 @@ int main()
 	{
 		// printf("ready queue: ");showqueueByname(Ready, Rlim);
 		// printf("block queue: ");showqueueByname(Block, Blim);
-		// showmemory(Memory, Mlim);
 		cont = FIFOextract(&running, 0, Ready, &Rlim);
 		// process consumes cpu
 		if (cont == 0)
@@ -178,8 +177,11 @@ int main()
 			deallocateMemory(&running, Memory, &Mlim); ///
 			FIFOadd(&running, Terminate, &Tlim);
 			/// after dealocating memory there is a chance for blocked processes
+			showmemory(Memory, Mlim);
 			if (Blim > 0)
 				checkBlockedes(globtimer, Block, &Blim, Ready, &Rlim, Memory, &Mlim);
+			showmemory(Memory, Mlim);
+
 		}
 		checkNewCommers(globtimer, New, &Nlim, Ready, &Rlim,
 										Memory, &Mlim, Block, &Blim);

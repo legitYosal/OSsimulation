@@ -85,7 +85,7 @@ void checkBlockedes(int globtimer, struct Process* Block, int* Blim, struct Proc
 			cont = FIFOextract(&survive, i, Block, Blim);
 			i--;
 			allocateMemory(result, &survive, Memory, Mlim);
-			printf(" ** blocked process %s has been re allocated to %lld", survive.name, result);
+			printf(" ** blocked process %s has been re allocated to %lld\n", survive.name, result);
 			printf("%s %d %llx %llx\n", survive.name, globtimer, survive.allocation, (survive.allocation + survive.memNeed - 1));
 			FIFOadd(&survive, Ready, Rlim);
 		}
@@ -152,15 +152,16 @@ int main()
 
 	printf("NEW ");showqueue(New, Nlim);
 	printf("READY ");showqueue(Ready, Rlim);
+	printf("BLOCK ");showqueue(Block, Blim);
 	showmemory(Memory, Mlim);
 
 	int cont;
 	printf("[***] scheduler started\n\n");
 	if (Rlim > 0) while(7999) // round rabin scheduler
 	{
-		printf("ready queue: ");showqueueByname(Ready, Rlim);
-		printf("block queue: ");showqueueByname(Block, Blim);
-		showmemory(Memory, Mlim);
+		// printf("ready queue: ");showqueueByname(Ready, Rlim);
+		// printf("block queue: ");showqueueByname(Block, Blim);
+		// showmemory(Memory, Mlim);
 		cont = FIFOextract(&running, 0, Ready, &Rlim);
 		// process consumes cpu
 		if (cont == 0)
@@ -169,7 +170,7 @@ int main()
 			globtimer += quantum;
 			running.burstT -= quantum;
 			FIFOadd(&running, Ready, &Rlim);
-			printf("%dms: %s take %dms and remained: %d ...\n", globtimer, running.name, quantum, running.burstT);
+			// printf("%dms: %s take %dms and remained: %d ...\n", globtimer, running.name, quantum, running.burstT);
 		} else{
 			globtimer += running.burstT;
 			// terminate process

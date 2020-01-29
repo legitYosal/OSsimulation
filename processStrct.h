@@ -12,7 +12,7 @@ struct Partition
 {
   long int size;
   long int address;
-  struct process* access;
+  struct Process* access;
   char status; // B stands for busy && F stands for free
 }
 #endif

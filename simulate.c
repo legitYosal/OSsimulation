@@ -4,7 +4,7 @@
 #include "functions.h"
 
 const int MAXPROCESS = 100;
-const long int MAXMEMSIZE = 8589934592;	 /* 8GB */
+const long int MAXMEMSIZE = 8589934591;	 /* 8GB */
 
 long int allocateMemory(struct Process* p, struct Partition* Memory, int* Mlim)
 {

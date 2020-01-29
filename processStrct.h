@@ -7,6 +7,8 @@ struct Process
 	int burstT;
 	long long int memNeed; // lesser than 8G available ram
   long long int allocation;
+  int waiting;
+  int swaped;
 };
 struct Partition
 {

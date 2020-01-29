@@ -85,9 +85,12 @@ int sortAreadinp(struct Process* processArr)
 	int limit;
 	scanf("%d", &limit);
 	int i;
-	for (i = 0; i < limit; i ++)
+	for (i = 0; i < limit; i ++){
 		 scanf("%s %d %d %lld", processArr[i].name, &processArr[i].startT, &processArr[i].burstT, &processArr[i].memNeed);
-	sortProcessQueuebyStartT(processArr, limit);
+     processArr[i].waiting = processArr[i].burstT / 2;
+     processArr[i].burstT = processArr[i].burstT / 2;
+  }
+  sortProcessQueuebyStartT(processArr, limit);
 	return limit;
 }
 

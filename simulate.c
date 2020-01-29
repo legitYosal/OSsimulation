@@ -133,6 +133,29 @@ int initMemory(struct Partition* memory)
 	return limit;
 }
 
+void checkio(int time, struct Process* IO, int* Ilim, struct Process* Block, int* Blim,
+							struct Process* Ready, int* Rlim)
+{
+	int i;
+	struct Process tmp;
+	for (i = 0; i < Ilim; i ++){
+		if (time >= IO[i].waiting){
+			FIFOextract(&tmp, i, IO, Ilim);
+			i--;
+			tmp.waiting = 0;
+			if (tmp.swaped == 1){
+				// means process is blocked
+				FIFOadd(&tmp, Block, Blim);
+			} else{
+				// means process is not blocked yet
+				FIFOadd(&tmp, Ready, Rlim);
+			}
+		} else{
+			IO[i].waiting -= time;
+		}
+	}
+}
+
 int main()
 {
 	int quantum = 50;
@@ -146,6 +169,8 @@ int main()
 	int Mlim = initMemory(Memory);
 	struct Process Block[MAXPROCESS];
 	int Blim = 0;
+	struct Process IO[MAXPROCESS];
+	int Ilim = 0;
 
 	int globtimer = New[0].startT;
 	checkNewCommers(globtimer, New, &Nlim, Ready, &Rlim,
@@ -165,28 +190,57 @@ int main()
 		// printf("block queue: ");showqueueByname(Block, Blim);
 		cont = FIFOextract(&running, 0, Ready, &Rlim);
 		// process consumes cpu
-		if (cont == 0)
-			globtimer = New[0].startT;
-		else if (running.burstT > quantum + 1){
+		if (cont == 0){
+			while(Rlim == 0 && Blim == 0)){
+				if (Nlim == 0 && Ilim == 0) break;
+				globtimer++
+				checkNewCommers(globtimer, New, &Nlim, Ready, &Rlim,
+												Memory, &Mlim, Block, &Blim);
+				checkio(1, IO, &Ilim, Block, &Blim, Ready, &Rlim);
+			}
+			if (Blim > 0)
+				checkBlockedes(globtimer, Block, &Blim, Ready, &Rlim, Memory, &Mlim);
+
+		}
+		else if (running.burstT >= quantum){
 			globtimer += quantum;
 			running.burstT -= quantum;
 			FIFOadd(&running, Ready, &Rlim);
+			if (Ilim > 0)
+				checkio(quantum, IO, &Ilim, Block, &Blim, Ready, &Rlim);
 			// printf("%dms: %s take %dms and remained: %d ...\n", globtimer, running.name, quantum, running.burstT);
 		} else{
 			globtimer += running.burstT;
 			// terminate process
-			printf("%dms: %s  terminated...\n", globtimer, running.name);
-			deallocateMemory(&running, Memory, &Mlim); ///
-			FIFOadd(&running, Terminate, &Tlim);
-			/// after dealocating memory there is a chance for blocked processes
-			// showmemory(Memory, Mlim);
+			if (Ilim > 0)
+				checkio(running.burstT, IO, &Ilim, Block, &Blim, Ready, &Rlim);
+			if (running.waiting == 0){
+				printf("%dms: %s  terminated...\n", globtimer, running.name);
+				deallocateMemory(&running, Memory, &Mlim); ///
+				FIFOadd(&running, Terminate, &Tlim);
+				/// after dealocating memory there is a chance for blocked processes
+				// showmemory(Memory, Mlim);
+			} else{
+				running.burstT = running.waiting;
+				running.waiting = running.waiting / 5;
+				if (Blim > 0){
+					printf("%dms: %s has been swaped for IO... \n", globtimer, running.name);
+					deallocateMemory(&running, Memory, &Mlim); ///
+					running.swaped = 1;
+				} else {
+					printf("%dms: %s is waiting for IO... \n", globtimer, running.name);
+					running.swaped = 0;
+				}
+				FIFOadd(&running, IO, &Ilim);
+			}
+
 			if (Blim > 0)
 				checkBlockedes(globtimer, Block, &Blim, Ready, &Rlim, Memory, &Mlim);
 
 		}
 		checkNewCommers(globtimer, New, &Nlim, Ready, &Rlim,
 										Memory, &Mlim, Block, &Blim);
-		if (Nlim == 0 && Rlim == 0) break; // means no process will ever come
+		if (Nlim == 0 && Rlim == 0 && Ilim == 0) break; // means no process will ever come
 	}
 	printf("\n[**] scheduling ended...\n");
 

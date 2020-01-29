@@ -29,12 +29,12 @@ void allocateMemory(long int bestfit, struct Process* p, struct Partition* Memor
 			swap((char *) &Memory[i], (char *) &Memory[i - 1]);
 	}
 }
-long int memoryAvailable(struct Process* p, struct Partition* Memory, int* Mlim)
+long int memoryAvailable(struct Process* p, struct Partition* Memory, int Mlim)
 {
 	int bestfit = -1;
 	long int bestsize = MAXMEMSIZE;
 	int i;
-	for (i = 0; i < *Mlim; i ++){ // for all free partitions in partition memory table
+	for (i = 0; i < Mlim; i ++){ // for all free partitions in partition memory table
 		if (Memory[i].status == 'F' && p->memNeed <= Memory[i].size)
 			if (Memory[i].size <= bestsize){ // here is allocation best fit policy
 				bestfit = i;
@@ -52,8 +52,6 @@ void uniteBelowPartitions(int index, struct Partition* Memory, int* Mlim)
 		Memory[index].size += Memory[index + 1].size;
 		for (i = index + 1; i < *Mlim - 1; i ++){
 			 	swap((char*) &Memory[i], (char*) &Memory[i + 1]);
-			 	if (Memory[i].status == 'B')
-			 			(Memory[i].access)->allocation = &Memory[i];
 	 	}
  		(*Mlim)--;
 		uniteBelowPartitions(index, Memory, Mlim);
@@ -62,12 +60,15 @@ void uniteBelowPartitions(int index, struct Partition* Memory, int* Mlim)
 
 void deallocateMemory(struct Process* p, struct Partition* Memory, int* Mlim)
 {
+	int index;
 	struct Partition* part = p->allocation;
+	for (index = 0; index < *Mlim; index++)
+		if (Memory[index].address == part->address)
+			break;
 	p->allocation = NULL;
-	part->access = NULL;
-	part->status = 'F';
+	Memory[index].access = NULL;
+	Memory[index].status = 'F';
 	// now that the partition is free memory manager must unite every partition that are neighbours
-	int index = ((void*) part - (void*) Memory) / sizeof(struct Partition);
 	while(index > 0 && Memory[index - 1].status == 'F') index --;
 	uniteBelowPartitions(index, Memory, Mlim);
 }
@@ -79,10 +80,14 @@ void checkBlockedes(struct Process* Block, int* Blim, struct Process* Ready, int
 	int i;
 	long int result;
 	for (i = 0; i < *Blim; i ++){
-		result = allocateMemory(&Block[i], Memory, Mlim);
+		result = memoryAvailable(&Block[i], Memory, *Mlim);
 		if (result != -1){
-			printf(" ** blocked process %s has been allocated to %ld", Block[i].name, result);
-			FIFOadd((struct Process*)FIFOextract(i, Block, Blim), Ready, Rlim);
+			struct Process survive;
+			FIFOextract(&survive, i, Block, Blim);
+			i--;
+			allocateMemory(result, &survive, Memory, Mlim);
+			printf(" ** blocked process %s has been allocated to %ld", survive.name, result);
+			FIFOadd(, Ready, Rlim);
 		}
 	}
 
@@ -96,7 +101,7 @@ void checkNewCommers(int globtimer, struct Process* New, int *Nlim, struct Proce
 		result = -1;
 		if (New[i].startT <= globtimer){
 			printf("%dms: prcess %s arrived ...\n", globtimer, New[i].name);
-			resutl = memoryAvailable(&New[i], Memory, Mlim);
+			result = memoryAvailable(&New[i], Memory, *Mlim);
 			if (result == -1){
 				printf("				... and it has blocked\n");
 				struct Process newblocked;

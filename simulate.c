@@ -111,8 +111,12 @@ void checkNewCommers(int globtimer, struct Process* New, int *Nlim, struct Proce
 			} else{
 				printf("				... and allocated to %lld\n", Memory[result].address);
 				FIFOextract(&tmp, 0, New, Nlim);
+				printf("process %s has extracted form queue new\n", tmp.name);
 				allocateMemory(result, &tmp, Memory, Mlim);
+				printf("and now it has property allocation with size: %lld\n", (tmp.allocation).size);
+				showmemory(Memory, *Mlim);
 				FIFOadd(&tmp, Ready, Rlim);
+				printf("process added to ready now have name:%s", Ready[*Rlim - 1]);
 			}
 		}
 		else

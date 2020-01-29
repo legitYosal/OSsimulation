@@ -11,6 +11,15 @@ void showqueue(struct Process* queue, int limit)
   printf("end...\n");
 }
 
+void showmemory(struct Partition* memory, int limit)
+{
+  printf("memory blocks: [  \n");
+  int i;
+  for(i = 0; i < limit; i ++)
+    printf("part%d: add: %lld  size: %lld\n", i, memory[i].address, memory[i].size);
+  printf("  ] end** \n");
+}
+
 void showProcessInf(struct Process p)
 {
   printf("process: %s\n", p.name);

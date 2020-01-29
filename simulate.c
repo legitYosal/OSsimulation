@@ -6,12 +6,33 @@
 const int MAXPROCESS = 100;
 const long int MAXMEMSIZE = (long int) 8589934592;	 /* 8GB */
 
-long int allocateMemory(struct Process* p, struct Partition* Memory, int* Mlim)
+void allocateMemory(long int bestfit, struct Process* p, struct Partition* Memory, int* Mlim)
+{
+	struct Partition busy;
+	struct Partition loose;
+
+	busy.size = p->memNeed;
+	busy.address = Memory[bestfit].address;
+	busy.access = p;
+	p->allocation = &busy;
+	busy.status = 'B';
+	if (Memory[bestfit].size - p->memNeed == 0){
+		Memory[bestfit] = busy;
+	}else{
+		// other size there will be a over head partition
+		loose.size = Memory[bestfit].size - p->memNeed;
+		loose.address = Memory[bestfit].address + p->memNeed;
+		loose.status = 'F';
+		Memory[bestfit] = busy;
+		Memory[(*Mlim)++] = loose;
+		for (i = *Mlim - 1; i > bestfit + 1; i --)
+			swap((char *) &Memory[i], (char *) &Memory[i - 1]);
+	}
+}
+long int memoryAvailable(struct Process* p, struct Partition* Memory, int* Mlim)
 {
 	int bestfit = -1;
 	long int bestsize = MAXMEMSIZE;
-	struct Partition busy;
-	struct Partition loose;
 	int i;
 	for (i = 0; i < *Mlim; i ++){ // for all free partitions in partition memory table
 		if (Memory[i].status == 'F' && p->memNeed <= Memory[i].size)
@@ -20,25 +41,6 @@ long int allocateMemory(struct Process* p, struct Partition* Memory, int* Mlim)
 				bestsize = Memory[i].size;
 			}
 	}
-	if (bestfit == -1) return -1;
-	// other wise founded a best fit then must allocate processs to the best fit partition
-	busy.size = p->memNeed;
-	busy.address = Memory[bestfit].address;
-	busy.access = p;
-	p->allocation = &busy;
-	busy.status = 'B';
-	if (Memory[bestfit].size - p->memNeed == 0){
-		Memory[bestfit] = busy;
-		return bestfit;
-	}
-	// other size there will be a over head partition
-	loose.size = Memory[bestfit].size - p->memNeed;
-	loose.address = Memory[bestfit].address + p->memNeed;
-	loose.status = 'F';
-	Memory[bestfit] = busy;
-	Memory[(*Mlim)++] = loose;
-	for (i = *Mlim - 1; i > bestfit + 1; i --)
-		swap((char *) &Memory[i], (char *) &Memory[i - 1]);
 	return bestfit;
 }
 
@@ -92,15 +94,17 @@ void checkNewCommers(int globtimer, struct Process* New, int *Nlim, struct Proce
 	long int result;
 	while (i < *Nlim){
 		result = -1;
-		if (New[i].startT < globtimer + 1){
+		if (New[i].startT <= globtimer){
 			printf("%dms: prcess %s arrived ...\n", globtimer, New[i].name);
-			result = allocateMemory(&New[i], Memory, Mlim);
+			resutl = memoryAvailable(&New[i], Memory, Mlim);
 			if (result == -1){
 				printf("				... and it has blocked\n");
 				FIFOadd((struct Process*)FIFOextract(0, New, Nlim), Block, Blim);
 			} else{
 				printf("				... and allocated to %ld\n", Memory[result].address);
-				FIFOadd((struct Process*)FIFOextract(0, New, Nlim), Ready, Rlim);
+				struct Process* p = (struct Process*)FIFOextract(0, New, Nlim);
+				allocateMemory(result, &p, Memory, Mlim);
+				FIFOadd(p, Ready, Rlim);
 			}
 		}
 		else
@@ -111,10 +115,11 @@ void checkNewCommers(int globtimer, struct Process* New, int *Nlim, struct Proce
 int initMemory(struct Partition* memory)
 {
 	int limit = 1;
-	memory->address = 0;
-	memory->size = MAXMEMSIZE; // maximom size of memory
-	memory->access = NULL;
-	memory->status = 'F';
+	memory[0].address = 0;
+	memory[0].size = MAXMEMSIZE; // maximom size of memory
+	memory[0].access = NULL;
+	memory[0].status = 'F';
+	printf("memory initated with one partition of size: %ld", memory[0].size);
 	return limit;
 }
 

@@ -23,7 +23,7 @@ void showqueueByname(struct Process* queue, int limit)
   int i;
   for (i = 0; i < limit; i ++)
     printf("(%s) ", i, queue[i].name);
-  printf("   ]\n");
+  printf("  ]\n");
 }
 
 void swap(char* a, char* b)
@@ -39,7 +39,6 @@ void swap(char* a, char* b)
         b[i] = tmp[i];
     free(tmp);
 }
-
 
 int partition(struct Process* processArr, int start, int end)
 {
@@ -87,10 +86,13 @@ int sortAreadinp(struct Process* processArr)
 void* FIFOextract(int witchone, struct Process* queue, int* limit)
 {
   if (*limit == 0) return NULL;
+  struct Process p;
 	int i = witchone;
   for (i; i < *limit - 1; i ++)
     swap((char *)&queue[i], (char *)&queue[i + 1]);
-  return (void*) &queue[--(*limit)];
+  p = queue[(*limit)];
+  (*limit) --;
+  return (void*) &p;
 }
 
 void FIFOadd(struct Process* p, struct Process* queue, int* limit)

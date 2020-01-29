@@ -6,7 +6,7 @@
 const int MAXPROCESS = 100;
 const long long int MAXMEMSIZE =  8589934592;	 /* 8GB */
 
-void allocateMemory(long long int bestfit, struct Process* p, struct Partition* Memory, int* Mlim)
+void allocateMemory(int bestfit, struct Process* p, struct Partition* Memory, int* Mlim)
 {
 	struct Partition busy;
 	struct Partition loose;
@@ -29,7 +29,7 @@ void allocateMemory(long long int bestfit, struct Process* p, struct Partition* 
 			swap((char *) &Memory[i], (char *) &Memory[i - 1]);
 	}
 }
-long long int memoryAvailable(struct Process* p, struct Partition* Memory, int Mlim)
+int memoryAvailable(struct Process* p, struct Partition* Memory, int Mlim)
 {
 	int bestfit = -1;
 	long long int bestsize = MAXMEMSIZE;
@@ -97,7 +97,8 @@ void checkNewCommers(int globtimer, struct Process* New, int *Nlim, struct Proce
 	 									struct Partition* Memory, int* Mlim, struct Process* Block, int* Blim)
 {
 	int i = 0;
-	long long int result;
+	int result;
+	struct Process tmp;
 	while (i < *Nlim){
 		result = -1;
 		if (New[i].startT <= globtimer){
@@ -105,15 +106,13 @@ void checkNewCommers(int globtimer, struct Process* New, int *Nlim, struct Proce
 			result = memoryAvailable(&New[i], Memory, *Mlim);
 			if (result == -1){
 				printf("				... and it has blocked\n");
-				struct Process newblocked;
-				FIFOextract(&newblocked, 0, New, Nlim);
-				FIFOadd(&newblocked, Block, Blim);
+				FIFOextract(&tmp, 0, New, Nlim);
+				FIFOadd(&tmp, Block, Blim);
 			} else{
 				printf("				... and allocated to %lld\n", Memory[result].address);
-				struct Process newready;
-				FIFOextract(&newready, 0, New, Nlim);
-				allocateMemory(result, &newready, Memory, Mlim);
-				FIFOadd(&newready, Ready, Rlim);
+				FIFOextract(&tmp, 0, New, Nlim);
+				allocateMemory(result, &tmp, Memory, Mlim);
+				FIFOadd(&tmp, Ready, Rlim);
 			}
 		}
 		else

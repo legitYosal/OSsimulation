@@ -6,16 +6,15 @@
 const int MAXPROCESS = 100;
 const long long int MAXMEMSIZE =  8589934592;	 /* 8GB */
 
-void allocateMemory(int bestfit, struct Process* p, struct Partition* Memory, int* Mlim)
+void allocateMemory(int bestfit, struct Process* p, struct Partition** prcPart, struct Partition* Memory, int* Mlim)
 {
 	struct Partition busy;
 	struct Partition loose;
 	int i;
 	busy.size = p->memNeed;
 	busy.address = Memory[bestfit].address;
-	busy.access = p;
-	p->allocation = &busy;
 	busy.status = 'B';
+	*prcPart = &busy;
 	if (Memory[bestfit].size - p->memNeed == 0){
 		Memory[bestfit] = busy;
 	}else{
@@ -66,7 +65,6 @@ void deallocateMemory(struct Process* p, struct Partition* Memory, int* Mlim)
 		if (Memory[index].address == part->address)
 			break;
 	p->allocation = NULL;
-	Memory[index].access = NULL;
 	Memory[index].status = 'F';
 	// now that the partition is free memory manager must unite every partition that are neighbours
 	while(index > 0 && Memory[index - 1].status == 'F') index --;
@@ -85,7 +83,7 @@ void checkBlockedes(struct Process* Block, int* Blim, struct Process* Ready, int
 			struct Process survive;
 			FIFOextract(&survive, i, Block, Blim);
 			i--;
-			allocateMemory(result, &survive, Memory, Mlim);
+			allocateMemory(result, &survive, &(survive.allocation), Memory, Mlim);
 			printf(" ** blocked process %s has been allocated to %lld", survive.name, result);
 			FIFOadd(&survive, Ready, Rlim);
 		}
@@ -116,7 +114,7 @@ void checkNewCommers(int globtimer, struct Process* New, int *Nlim, struct Proce
 				printf("and now it has property allocation with size: %lld\n", (tmp.allocation)->size);
 				showmemory(Memory, *Mlim);
 				FIFOadd(&tmp, Ready, Rlim);
-				printf("process added to ready now have name:%s", Ready[*Rlim - 1]);
+				printf("process added to ready now have name:%s", Ready[*Rlim - 1].name);
 			}
 		}
 		else
@@ -129,7 +127,6 @@ int initMemory(struct Partition* memory)
 	int limit = 1;
 	memory[0].address = 0;
 	memory[0].size = MAXMEMSIZE; // maximom size of memory
-	memory[0].access = NULL;
 	memory[0].status = 'F';
 	printf("memory initated with one partition of size: %lld\n", memory[0].size);
 	return limit;

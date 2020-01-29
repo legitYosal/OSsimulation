@@ -12,7 +12,6 @@ struct Partition
 {
   long long int size;
   long long int address;
-  struct Process* access; // this is note implicity ** bug hazard
   char status; // B stands for busy && F stands for free
 };
 #endif

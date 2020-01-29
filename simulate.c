@@ -138,7 +138,7 @@ void checkio(int time, struct Process* IO, int* Ilim, struct Process* Block, int
 {
 	int i;
 	struct Process tmp;
-	for (i = 0; i < Ilim; i ++){
+	for (i = 0; i < *Ilim; i ++){
 		if (time >= IO[i].waiting){
 			FIFOextract(&tmp, i, IO, Ilim);
 			i--;
@@ -191,9 +191,9 @@ int main()
 		cont = FIFOextract(&running, 0, Ready, &Rlim);
 		// process consumes cpu
 		if (cont == 0){
-			while(Rlim == 0 && Blim == 0)){
+			while(Rlim == 0 && Blim == 0){
 				if (Nlim == 0 && Ilim == 0) break;
-				globtimer++
+				globtimer++;
 				checkNewCommers(globtimer, New, &Nlim, Ready, &Rlim,
 												Memory, &Mlim, Block, &Blim);
 				checkio(1, IO, &Ilim, Block, &Blim, Ready, &Rlim);

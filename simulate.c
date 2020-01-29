@@ -6,7 +6,7 @@
 const int MAXPROCESS = 100;
 const long long int MAXMEMSIZE =  8589934592;	 /* 8GB */
 
-void allocateMemory(int bestfit, struct Process* p, struct Partition** prcPart, struct Partition* Memory, int* Mlim)
+void allocateMemory(int bestfit, struct Process* p, struct Partition* Memory, int* Mlim)
 {
 	struct Partition busy;
 	struct Partition loose;
@@ -14,7 +14,7 @@ void allocateMemory(int bestfit, struct Process* p, struct Partition** prcPart, 
 	busy.size = p->memNeed;
 	busy.address = Memory[bestfit].address;
 	busy.status = 'B';
-	*prcPart = &busy;
+	p->allocation = busy.address;
 	if (Memory[bestfit].size - p->memNeed == 0){
 		Memory[bestfit] = busy;
 	}else{
@@ -60,11 +60,10 @@ void uniteBelowPartitions(int index, struct Partition* Memory, int* Mlim)
 void deallocateMemory(struct Process* p, struct Partition* Memory, int* Mlim)
 {
 	int index;
-	struct Partition* part = p->allocation;
 	for (index = 0; index < *Mlim; index++)
-		if (Memory[index].address == part->address)
+		if (Memory[index].address == p->allocation)
 			break;
-	p->allocation = NULL;
+	p->allocation = -1;
 	Memory[index].status = 'F';
 	// now that the partition is free memory manager must unite every partition that are neighbours
 	while(index > 0 && Memory[index - 1].status == 'F') index --;
@@ -83,7 +82,7 @@ void checkBlockedes(struct Process* Block, int* Blim, struct Process* Ready, int
 			struct Process survive;
 			FIFOextract(&survive, i, Block, Blim);
 			i--;
-			allocateMemory(result, &survive, &(survive.allocation), Memory, Mlim);
+			allocateMemory(result, &survive, Memory, Mlim);
 			printf(" ** blocked process %s has been allocated to %lld", survive.name, result);
 			FIFOadd(&survive, Ready, Rlim);
 		}
@@ -110,8 +109,8 @@ void checkNewCommers(int globtimer, struct Process* New, int *Nlim, struct Proce
 				printf("				... and allocated to %lld\n", Memory[result].address);
 				FIFOextract(&tmp, 0, New, Nlim);
 				printf("process %s has extracted form queue new\n", tmp.name);
-				allocateMemory(result, &tmp, &(tmp.allocation), Memory, Mlim);
-				printf("and now it has property allocation with size: %lld\n", (tmp.allocation)->size);
+				allocateMemory(result, &tmp, Memory, Mlim);
+				printf("and now it has property allocation with size: %lld\n", (tmp.allocation));
 				showmemory(Memory, *Mlim);
 				FIFOadd(&tmp, Ready, Rlim);
 				printf("process added to ready now have name:%s", Ready[*Rlim - 1].name);

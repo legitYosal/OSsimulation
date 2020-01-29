@@ -6,7 +6,7 @@ struct Process
 	int startT;
 	int burstT;
 	long long int memNeed; // lesser than 8G available ram
-  struct Partition* allocation;
+  long long int allocation;
 };
 struct Partition
 {

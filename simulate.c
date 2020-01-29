@@ -87,7 +87,7 @@ void checkBlockedes(struct Process* Block, int* Blim, struct Process* Ready, int
 			i--;
 			allocateMemory(result, &survive, Memory, Mlim);
 			printf(" ** blocked process %s has been allocated to %ld", survive.name, result);
-			FIFOadd(, Ready, Rlim);
+			FIFOadd(&survive, Ready, Rlim);
 		}
 	}
 
@@ -106,13 +106,13 @@ void checkNewCommers(int globtimer, struct Process* New, int *Nlim, struct Proce
 				printf("				... and it has blocked\n");
 				struct Process newblocked;
 				FIFOextract(&newblocked, 0, New, Nlim);
-				FIFOadd(newblocked, Block, Blim);
+				FIFOadd(&newblocked, Block, Blim);
 			} else{
 				printf("				... and allocated to %ld\n", Memory[result].address);
 				struct Process newready;
 				FIFOextract(&newready, 0, New, Nlim);
 				allocateMemory(result, &newready, Memory, Mlim);
-				FIFOadd(newready, Ready, Rlim);
+				FIFOadd(&newready, Ready, Rlim);
 			}
 		}
 		else
@@ -152,15 +152,15 @@ int main()
 
 	printf("NEW ");showqueue(New, Nlim);
 	printf("READY ");showqueue(Ready, Rlim);
-
+	int cont;
 	printf("[***] scheduler started\n\n");
 	if (Rlim > 0) while(7999) // round rabin scheduler
 	{
 		printf("ready queue: ");showqueueByname(Ready, Rlim);
 		printf("block queue: ");showqueueByname(Block, Blim);
-		FIFOextract(&running, 0, Ready, &Rlim);
+		cont = FIFOextract(&running, 0, Ready, &Rlim);
 		// process consumes cpu
-		if (running == NULL)
+		if (cont == 0)
 			globtimer = New[0].startT;
 		else if (running.burstT > quantum + 1){
 			globtimer += quantum;

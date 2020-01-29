@@ -60,8 +60,7 @@ int partition(struct Process* processArr, int start, int end)
 
 int quicksort(struct Process* processArr, int start, int end)
 {
-	if (start < end)
-	{
+	if (start < end){
 		int pivot = partition(processArr, start, end);
 		quicksort(processArr, start, pivot - 1);
 		quicksort(processArr, pivot + 1, end);

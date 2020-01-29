@@ -155,7 +155,7 @@ int main()
 	printf("NEW ");showqueue(New, Nlim);
 	printf("READY ");showqueue(Ready, Rlim);
 	printf("BLOCK ");showqueue(Block, Blim);
-	showmemory(Memory, Mlim);
+	// showmemory(Memory, Mlim);
 
 	int cont;
 	printf("[***] scheduler started\n\n");
@@ -175,11 +175,11 @@ int main()
 		} else{
 			globtimer += running.burstT;
 			// terminate process
-			printf("%dms: %s take %dms and terminated...\n", globtimer, running.name, running.burstT);
+			printf("%dms: %s  terminated...\n", globtimer, running.name);
 			deallocateMemory(&running, Memory, &Mlim); ///
 			FIFOadd(&running, Terminate, &Tlim);
 			/// after dealocating memory there is a chance for blocked processes
-			showmemory(Memory, Mlim);
+			// showmemory(Memory, Mlim);
 			if (Blim > 0)
 				checkBlockedes(globtimer, Block, &Blim, Ready, &Rlim, Memory, &Mlim);
 

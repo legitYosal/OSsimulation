@@ -133,7 +133,7 @@ int initMemory(struct Partition* memory)
 	return limit;
 }
 
-void checkio(int time, struct Process* IO, int* Ilim, struct Process* Block, int* Blim,
+void checkio(int globtimer, int time, struct Process* IO, int* Ilim, struct Process* Block, int* Blim,
 							struct Process* Ready, int* Rlim)
 {
 	int i;
@@ -148,6 +148,7 @@ void checkio(int time, struct Process* IO, int* Ilim, struct Process* Block, int
 				FIFOadd(&tmp, Block, Blim);
 			} else{
 				// means process is not blocked yet
+				printf("%dms: %s has returned to ready from io wait..\n", globtimer, tmp.name);
 				FIFOadd(&tmp, Ready, Rlim);
 			}
 		} else{
@@ -196,7 +197,7 @@ int main()
 				globtimer++;
 				checkNewCommers(globtimer, New, &Nlim, Ready, &Rlim,
 												Memory, &Mlim, Block, &Blim);
-				checkio(1, IO, &Ilim, Block, &Blim, Ready, &Rlim);
+				checkio(globtimer, 1, IO, &Ilim, Block, &Blim, Ready, &Rlim);
 			}
 			if (Blim > 0)
 				checkBlockedes(globtimer, Block, &Blim, Ready, &Rlim, Memory, &Mlim);
@@ -207,13 +208,13 @@ int main()
 			running.burstT -= quantum;
 			FIFOadd(&running, Ready, &Rlim);
 			if (Ilim > 0)
-				checkio(quantum, IO, &Ilim, Block, &Blim, Ready, &Rlim);
+				checkio(globtimer, quantum, IO, &Ilim, Block, &Blim, Ready, &Rlim);
 			// printf("%dms: %s take %dms and remained: %d ...\n", globtimer, running.name, quantum, running.burstT);
 		} else{
 			globtimer += running.burstT;
 			// terminate process
 			if (Ilim > 0)
-				checkio(running.burstT, IO, &Ilim, Block, &Blim, Ready, &Rlim);
+				checkio(globtimer, running.burstT, IO, &Ilim, Block, &Blim, Ready, &Rlim);
 			if (running.waiting == 0){
 				printf("%dms: %s  terminated...\n", globtimer, running.name);
 				deallocateMemory(&running, Memory, &Mlim); ///

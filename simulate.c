@@ -88,7 +88,7 @@ void checkBlockedes(int globtimer, struct Process* Block, int* Blim, struct Proc
 			printf(" ** blocked process %s has been re allocated to %lld\n", survive.name, result);
 			printf("%s %d %llx %llx\n", survive.name, globtimer, survive.allocation, (survive.allocation + survive.memNeed - 1));
 			FIFOadd(&survive, Ready, Rlim);
-			showmemory(Memory, Mlim);
+			showmemory(Memory, *Mlim);
 		}
 	}
 
@@ -115,7 +115,7 @@ void checkNewCommers(int globtimer, struct Process* New, int *Nlim, struct Proce
 				allocateMemory(result, &tmp, Memory, Mlim);
 				printf("%s %d %llx %llx\n", tmp.name, globtimer, tmp.allocation, (tmp.allocation + tmp.memNeed - 1));
 				FIFOadd(&tmp, Ready, Rlim);
-				showmemory(Memory, Mlim);
+				showmemory(Memory, *Mlim);
 			}
 		}
 		else
